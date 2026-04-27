@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products – Greenfield Local Hub</title>
+
+    <!-- I'm linking my global styles first, then the products-specific CSS which includes
+         the cart drawer and checkout modal styles all in one file -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/products.css">
+</head>
+
+<body>
+
+    <!-- I wrap the entire page in .page-wrap so I can control the max-width
+     and centre the layout from my global stylesheet -->
+    <div class="page-wrap">
+
+        <!-- =====================================================
+         NAVBAR
+         I built this navbar to sit at the top of every page.
+         I added the cart toggle button inside the header so
+         it's always visible and aligned to the right of the nav links.
+    ====================================================== -->
+        <header class="navbar">
+
+            <!-- My logo image — I'm using an Unsplash farm photo as a placeholder
+             until I get the real Greenfield logo -->
+            <div class="logo-badge">
+                <img src="image/Web Logo.png"
+                    alt="Logo">
+            </div>
+
+            <!-- I list the main nav links here. I add the "active" class to whichever
+             page the user is currently on so it gets highlighted in the CSS -->
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="products.html" class="active">Products</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html">Sign Up</a>
+                <a href="contact.html">Contact</a>
+
+            </nav>
+
+            <!-- This is my cart icon button. When clicked it calls toggleCart() in my JS
+             which slides in the cart drawer from the right.
+             The cartBadge span shows how many items are in the basket —
+             my JS updates this number every time a product is added or removed -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="cart-toggle" onclick="toggleCart()" aria-label="Open cart">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 01-8 0" />
+                    </svg>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+
+                <!-- Profile Avatar with Dropdown -->
+                <div style="position: relative;">
+                    <div id="profile-avatar" onclick="toggleProfileMenu()" style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #379f3b;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        ">?</div>
+
+                    <!-- Dropdown Menu -->
+                    <!-- Dropdown Menu -->
+                    <div id="profile-dropdown" style="
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    min-width: 200px;
+    z-index: 999;
+    overflow: hidden;
+">
+                        <!-- User Info Header -->
+                        <div style="
+        padding: 15px;
+        background: #379f3b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    ">
+                            <div style="
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            color: #379f3b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        " id="dropdown-initials">?</div>
+                            <div>
+                                <div id="dropdown-email" style="
+                font-size: 12px;
+                color: white;
+                max-width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            "></div>
+                            </div>
+                        </div>
+
+                        <!-- Logout Button -->
+                        <div onclick="logout()" style="
+        padding: 12px 15px;
+        cursor: pointer;
+        color: #e53935;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+    " onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background='white'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e53935"
+                                stroke-width="2">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Logout
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- =====================================================
+         HERO BANNER
+         I use a full-width farm photo here to set the mood
+         for the shop page. The overlay div lets me place text
+         on top of the image while keeping it readable.
+    ====================================================== -->
+        <section class="shop-hero">
+            <img src="image/landscape.jpg"
+                alt="Farm market">
+            <div class="shop-hero-overlay">
+                <div>
+                    <h1>Farm Fresh Shop</h1>
+                    <p>Sourced directly from local farmers — delivered to your door</p>
+                </div>
+            </div>
+        </section>
+        
+
+        <!-- =====================================================
+         SHOP LAYOUT
+         I use a flex container here with the sidebar on the
+         left and the product grid on the right. On mobile
+         my CSS stacks them vertically.
+    ====================================================== -->
+        <div class="shop-wrap">
+
+            <!-- =====================================================
+             SIDEBAR — FILTERS
+             I built all the filters here. My products.js reads
+             the values from these inputs and hides/shows cards
+             in real time using the filterCards() function.
+        ====================================================== -->
+            <aside class="sidebar">
+
+                <!-- Live search — I listen for the "input" event in JS and filter
+                 cards by matching the typed text against each card's data-name attribute -->
+                <input type="text" id="search" placeholder="Search products...">
+
+                <!-- Category filter buttons — each button has a data-cat attribute that
+                 my JS uses to match against each product card's data-cat attribute.
+                 "all" shows every product regardless of category -->
+                <div class="sb-title">Categories</div>
+                <button class="cat-btn active" data-cat="all">All Products <span>24</span></button>
+                <button class="cat-btn" data-cat="Vegetables">Vegetables <span>6</span></button>
+                <button class="cat-btn" data-cat="Fruit">Fruit <span>5</span></button>
+                <button class="cat-btn" data-cat="Meat">Meat <span>5</span></button>
+                <button class="cat-btn" data-cat="Dairy & Eggs">Dairy &amp; Eggs <span>5</span></button>
+                <button class="cat-btn" data-cat="Pantry">Pantry <span>3</span></button>
+
+                <!-- Price range slider — my JS updates the £ label as the user drags it
+                 and hides any product cards priced above the selected value -->
+                <div class="sb-gap">
+                    <div class="sb-title">Price Range</div>
+                    <p class="price-val">Up to <strong id="priceVal">£20.00</strong></p>
+                    <input type="range" id="priceRange" min="1" max="20" value="20" step="0.5">
+                    <div class="price-minmax"><span>£1</span><span>£20</span></div>
+                </div>
+
+                <!-- In-stock checkbox — when checked, my JS hides any cards
+                 with data-stock="out" so only available products show -->
+                <label class="stock-label">
+                    <input type="checkbox" id="stockOnly"> In stock only
+                </label>
+
+            </aside>
+
+            <!-- =====================================================
+             MAIN PRODUCT AREA
+             This is where all my product cards live, grouped
+             into category sections. The top bar shows how many
+             products are currently visible and lets the user sort them.
+        ====================================================== -->
+            <main class="main">
+
+                <!-- Top bar — my JS updates the count text as filters change.
+                 The sort dropdown reorders the cards in the DOM when changed -->
+                <div class="top-bar">
+                    <span id="count">Showing 24 products</span>
+                    <select id="sort">
+                        <option value="">Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="az">Name: A–Z</option>
+                    </select>
+                </div>
+
+                <!-- I show this message only when no products match the active filters.
+                 My JS toggles its display between "block" and "none" -->
+                <p class="no-results" id="empty">No products match your filters.</p>
+
+                <!-- =====================================================
+                 PRODUCT CARDS
+                 Each card uses data attributes so my JS can filter,
+                 sort and add them to the cart without needing IDs.
+
+                   data-cat   → category name (must match sidebar buttons exactly)
+                   data-price → numeric price used for filtering and sorting
+                   data-stock → "in" or "low" (I plan to add "out" later)
+                   data-name  → keywords used for search; also used as the unique
+                                cart item ID so I made sure every data-name is
+                                distinct to avoid two products merging in the basket
+
+                 The Add to Cart button passes itself (this) to addCart() so
+                 my JS can walk up to the parent .card and read its data attributes.
+            ====================================================== -->
+
+                <!-- VEGETABLES -->
+                <div class="cat-section">
+                    <div class="cat-title">
+                        <h2>Vegetables</h2>
+                        <div class="line"></div><span class="sub">Locally Grown</span>
+                    </div>
+                    <div class="grid">
+
+                        <div class="card" data-cat="Vegetables" data-price="1.44" data-stock="in"
+                            data-name="organic carrots earthy local fields">
+                            <img src="image/carrot.jpg"
+                                alt="Organic Carrots">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Organic Carrots</h3>
+                                <p class="card-desc">Sweet and earthy, freshly pulled from local fields.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£1.44 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Vegetables" data-price="2.10" data-stock="in"
+                            data-name="fresh spinach baby leaves">
+                            <img src="image/spinach.jpg"
+                                alt="Fresh Spinach">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Fresh Spinach</h3>
+                                <p class="card-desc">Tender baby leaves, picked at peak freshness.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£2.10 <span>/ bag</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Vegetables" data-price="1.80" data-stock="in"
+                            data-name="farm potatoes maris piper roasting">
+                            <img src="image/potatos.jpg"
+                                alt="Farm Potatoes">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Farm Potatoes</h3>
+                                <p class="card-desc">Maris Piper variety, perfect for roasting or mash.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£1.80 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Vegetables" data-price="2.50" data-stock="in"
+                            data-name="vine tomatoes sun-ripened flavour">
+                            <img src="image/tomato.jpg"
+                                alt="Vine Tomatoes">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Vine Tomatoes</h3>
+                                <p class="card-desc">Sun-ripened on the vine, bursting with flavour.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£2.50 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- I use "low" stock here — my CSS gives this badge an amber colour
+                         to warn the customer without blocking the sale -->
+                        <div class="card" data-cat="Vegetables" data-price="1.20" data-stock="low"
+                            data-name="courgettes grilled pasta">
+                            <img src="image/courgetes.jpg"
+                                alt="Courgettes">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge low">Low Stock</span>
+                                <h3>Courgettes</h3>
+                                <p class="card-desc">Tender and versatile, great grilled or in pasta.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£1.20 <span>/ each</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Vegetables" data-price="3.20" data-stock="in"
+                            data-name="sweet corn golden cobs sweetness">
+                            <img src="image/corn 1 .jpg"
+                                alt="Sweet Corn">
+                            <div class="card-body">
+                                <div class="card-cat">Vegetables</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Sweet Corn</h3>
+                                <p class="card-desc">Plump golden cobs harvested at peak sweetness.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.20 <span>/ 3 cobs</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- FRUIT -->
+                <div class="cat-section">
+                    <div class="cat-title">
+                        <h2>Fruit</h2>
+                        <div class="line"></div><span class="sub">Orchard Fresh</span>
+                    </div>
+                    <div class="grid">
+
+                        <div class="card" data-cat="Fruit" data-price="3.11" data-stock="in"
+                            data-name="fresh figs honey sweet orchard">
+                            <img src="image/freshfigs.jpg"
+                                alt="Fresh Figs">
+                            <div class="card-body">
+                                <div class="card-cat">Fruit</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Fresh Figs</h3>
+                                <p class="card-desc">Rich, honey-sweet figs from our local orchard.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.11 <span>/ punnet</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Fruit" data-price="2.80" data-stock="in"
+                            data-name="cox apples crisp british baking">
+                            <img src="image/apple.jpg"
+                                alt="Cox Apples">
+                            <div class="card-body">
+                                <div class="card-cat">Fruit</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Cox Apples</h3>
+                                <p class="card-desc">Crisp British variety, perfect for eating or baking.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£2.80 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Fruit" data-price="4.50" data-stock="in"
+                            data-name="strawberries hand-picked field ripened">
+                            <img src="image/strawberiess.jpg"
+                                alt="Strawberries">
+                            <div class="card-body">
+                                <div class="card-cat">Fruit</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Strawberries</h3>
+                                <p class="card-desc">Hand-picked, field-ripened and full of flavour.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£4.50 <span>/ punnet</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Fruit" data-price="3.60" data-stock="low"
+                            data-name="victoria plums british sweet tart">
+                            <img src="image/plums.jpg"
+                                alt="Victoria Plums">
+                            <div class="card-body">
+                                <div class="card-cat">Fruit</div>
+                                <span class="badge low">Low Stock</span>
+                                <h3>Victoria Plums</h3>
+                                <p class="card-desc">Classic British plums, sweet and slightly tart.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.60 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Fruit" data-price="2.20" data-stock="in"
+                            data-name="conference pears juicy fragrant orchard">
+                            <img src="image/pear.jpg"
+                                alt="Conference Pears">
+                            <div class="card-body">
+                                <div class="card-cat">Fruit</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Conference Pears</h3>
+                                <p class="card-desc">Juicy and fragrant, straight from the orchard.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£2.20 <span>/ kg</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- MEAT
+                 I made sure each data-name here starts with a unique word
+                 (beef, free-range, lamb, pork, sirloin) so the cart ID
+                 system doesn't accidentally merge two different products -->
+                <div class="cat-section">
+                    <div class="cat-title">
+                        <h2>Meat</h2>
+                        <div class="line"></div><span class="sub">Grass Fed · Free Range</span>
+                    </div>
+                    <div class="grid">
+
+                        <div class="card" data-cat="Meat" data-price="9.50" data-stock="in"
+                            data-name="beef mince grass-fed somerset">
+                            <img src="image/beef.jpg"
+                                alt="Beef Mince">
+                            <div class="card-body">
+                                <div class="card-cat">Meat</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Beef Mince</h3>
+                                <p class="card-desc">Lean, grass-fed beef from a local Somerset farm.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£9.50 <span>/ 500g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- I hyphenated "free-range" in data-name so it's one token
+                         and doesn't collide with "free-range eggs" in Dairy & Eggs -->
+                        <div class="card" data-cat="Meat" data-price="7.20" data-stock="in"
+                            data-name="free-range chicken outdoor whole bird">
+                            <img src="image/chicken.jpg"
+                                alt="Free-Range Chicken">
+                            <div class="card-body">
+                                <div class="card-cat">Meat</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Free-Range Chicken</h3>
+                                <p class="card-desc">Whole bird, outdoor-reared for the best flavour.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£7.20 <span>/ bird</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Meat" data-price="12.00" data-stock="low"
+                            data-name="lamb chops tender rack locally reared">
+                            <img src="image/lamb.jpg"
+                                alt="Lamb Chops">
+                            <div class="card-body">
+                                <div class="card-cat">Meat</div>
+                                <span class="badge low">Low Stock</span>
+                                <h3>Lamb Chops</h3>
+                                <p class="card-desc">Tender rack of lamb chops, locally reared.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£12.00 <span>/ 4 chops</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Meat" data-price="8.50" data-stock="in"
+                            data-name="pork sausages traditional butcher bangers">
+                            <img src="image/sausage.jpg"
+                                alt="Pork Sausages">
+                            <div class="card-body">
+                                <div class="card-cat">Meat</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Pork Sausages</h3>
+                                <p class="card-desc">Traditional pork bangers made by our local butcher.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£8.50 <span>/ 6 pack</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Meat" data-price="14.00" data-stock="in"
+                            data-name="sirloin steak dry-aged grass-fed cattle">
+                            <img src="image/steak.jpg"
+                                alt="Sirloin Steak">
+                            <div class="card-body">
+                                <div class="card-cat">Meat</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Sirloin Steak</h3>
+                                <p class="card-desc">28-day dry-aged sirloin from grass-fed cattle.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£14.00 <span>/ 250g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- DAIRY & EGGS
+                 I use &amp; in the heading because & is a reserved HTML character —
+                 the browser needs the escaped version to render it correctly -->
+                <div class="cat-section">
+                    <div class="cat-title">
+                        <h2>Dairy &amp; Eggs</h2>
+                        <div class="line"></div><span class="sub">Farm Fresh</span>
+                    </div>
+                    <div class="grid">
+
+                        <div class="card" data-cat="Dairy & Eggs" data-price="3.86" data-stock="in"
+                            data-name="free-range eggs golden yolked hens outdoor">
+                            <img src="image/egg.jps.PNG"
+                                alt="Free-Range Eggs">
+                            <div class="card-body">
+                                <div class="card-cat">Dairy &amp; Eggs</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Free-Range Eggs</h3>
+                                <p class="card-desc">Golden-yolked eggs from hens with outdoor access.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.86 <span>/ dozen</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Dairy & Eggs" data-price="1.80" data-stock="in"
+                            data-name="whole milk creamy full-fat dairy cows">
+                            <img src="image/milk.jpg"
+                                alt="Whole Milk">
+                            <div class="card-body">
+                                <div class="card-cat">Dairy &amp; Eggs</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Whole Milk</h3>
+                                <p class="card-desc">Creamy full-fat milk from grass-fed dairy cows.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£1.80 <span>/ litre</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Dairy & Eggs" data-price="4.20" data-stock="in"
+                            data-name="mature cheddar somerset aged sharp rich">
+                            <img src="image/cheadders.PNG"
+                                alt="Mature Cheddar">
+                            <div class="card-body">
+                                <div class="card-cat">Dairy &amp; Eggs</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Mature Cheddar</h3>
+                                <p class="card-desc">Aged Somerset cheddar with a sharp, rich flavour.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£4.20 <span>/ 200g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Dairy & Eggs" data-price="2.50" data-stock="low"
+                            data-name="farmhouse butter churned cream golden">
+                            <img src="image/butter.PNG"
+                                alt="Farmhouse Butter">
+                            <div class="card-body">
+                                <div class="card-cat">Dairy &amp; Eggs</div>
+                                <span class="badge low">Low Stock</span>
+                                <h3>Farmhouse Butter</h3>
+                                <p class="card-desc">Churned from local cream — rich and golden.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£2.50 <span>/ 250g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Dairy & Eggs" data-price="3.00" data-stock="in"
+                            data-name="natural yoghurt thick set full-fat no additives">
+                            <img src="image/yogurt.jpg"
+                                alt="Natural Yoghurt">
+                            <div class="card-body">
+                                <div class="card-cat">Dairy &amp; Eggs</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Natural Yoghurt</h3>
+                                <p class="card-desc">Thick set, full-fat local milk. No additives.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.00 <span>/ 500g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- PANTRY -->
+                <div class="cat-section">
+                    <div class="cat-title">
+                        <h2>Pantry</h2>
+                        <div class="line"></div><span class="sub">Jams, Honey &amp; More</span>
+                    </div>
+                    <div class="grid">
+
+                        <div class="card" data-cat="Pantry" data-price="7.99" data-stock="in"
+                            data-name="local honey raw wildflower hives">
+                            <img src="image/honey.jpg"
+                                alt="Local Honey">
+                            <div class="card-body">
+                                <div class="card-cat">Pantry</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Local Honey</h3>
+                                <p class="card-desc">Raw wildflower honey, harvested from local hives.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£7.99 <span>/ 340g</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Pantry" data-price="3.50" data-stock="in"
+                            data-name="strawberry jam home-made preserve whole fruit">
+                            <img src="image/jam.jpg"
+                                alt="Strawberry Jam">
+                            <div class="card-body">
+                                <div class="card-cat">Pantry</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Strawberry Jam</h3>
+                                <p class="card-desc">Home-made style preserve, full of whole fruit pieces.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£3.50 <span>/ jar</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" data-cat="Pantry" data-price="5.20" data-stock="in"
+                            data-name="apple cider-vinegar raw unfiltered locally pressed">
+                            <img src="image/Apple_Cider.jpg"
+                                alt="Apple Cider Vinegar">
+                            <div class="card-body">
+                                <div class="card-cat">Pantry</div>
+                                <span class="badge in">In Stock</span>
+                                <h3>Apple Cider Vinegar</h3>
+                                <p class="card-desc">Raw, unfiltered, with the mother — locally pressed.</p>
+                                <div class="card-foot">
+                                    <div class="card-price">£5.20 <span>/ 500ml</span></div>
+                                    <button class="add-btn" onclick="addCart(this)">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+    </div><!-- end .page-wrap -->
+    
+
+    <!-- =====================================================
+     FOOTER
+     I split the footer into three columns using flex in
+     my CSS: brand info, quick links and contact details.
+====================================================== -->
+    <footer>
+        <div class="footer-col">
+            <h3>Greenfield Local Hub</h3>
+            <p>Connecting our community with fresh, local farm products.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Farm Shop</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <p>Greenfeildlocalhub@gmail.com</p>
+            <p>+44 123 456 7890</p>
+            <p>Greenfield Community Market</p>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Greenfield Local Hub • Supporting Local Farms</p>
+        </div>
+    </footer>
+
+    <!-- =====================================================
+     CART OVERLAY
+     This is the dark semi-transparent backdrop that appears
+     behind the cart drawer. I put an onclick on it so clicking
+     anywhere outside the drawer closes it automatically.
+====================================================== -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+    <!-- =====================================================
+     CART DRAWER
+     This slides in from the right when the user clicks the
+     cart button in the navbar. My JS populates #cartItems
+     dynamically — I never hardcode product rows here.
+
+     I split the drawer into three sections:
+       1. cart-empty   shown when the basket has nothing in it
+       2. cart-items   the scrollable list of added products
+       3. cart-footer  subtotal + checkout button, hidden until
+                       at least one item is in the cart
+====================================================== -->
+    <aside class="cart-drawer" id="cartDrawer">
+
+        <div class="cart-header">
+            <h2>Your Basket</h2>
+            <!-- I use a plain × character instead of an icon so there
+             are no extra dependencies just for a close button -->
+            <button class="cart-close" onclick="toggleCart()">✕</button>
+        </div>
+
+        <!-- I show this empty state by default and my JS hides it
+         as soon as the first item is added to the basket -->
+        <div class="cart-empty" id="cartEmpty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.35">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            <p>Your basket is empty</p>
+            <span>Add some fresh produce to get started</span>
+        </div>
+
+        <!-- My JS writes cart item HTML into this div every time the cart state changes -->
+        <div class="cart-items" id="cartItems"></div>
+
+        <!-- I hide this footer until at least one item is in the cart.
+         "Proceed to Checkout" triggers openCheckout() in my JS which
+         builds and shows the 3-step checkout modal -->
+        <div class="cart-footer" id="cartFooter" style="display:none">
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <!-- My JS recalculates and updates this total on every cart change -->
+                <strong id="cartTotal">£0.00</strong>
+            </div>
+            <p class="cart-note">Delivery calculated at checkout</p>
+            <button class="checkout-btn">Proceed to Checkout →</button>
+            <button class="continue-btn" onclick="toggleCart()">Continue Shopping</button>
+        </div>
+
+    </aside>
+
+    <!-- =====================================================
+     JAVASCRIPT
+     I load my JS at the very bottom of the body so that
+     all the HTML elements already exist in the DOM when
+     the script runs. This means querySelectorAll(".card")
+     will find all the product cards immedidately.
+====================================================== -->
+    <script src="js/products.js"></script>
+<script>
+    const email = localStorage.getItem('userEmail');
+    if (email) {
+        const initials = email.substring(0, 2).toUpperCase();
+        document.getElementById('profile-avatar').textContent = initials;
+        document.getElementById('dropdown-email').textContent = email;
+        document.getElementById('dropdown-initials').textContent = initials;
+    }
+
+    function toggleProfileMenu() {
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('click', function(e) {
+        const avatar = document.getElementById('profile-avatar');
+        const dropdown = document.getElementById('profile-dropdown');
+        if (!avatar.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem('userEmail');
+        window.location.href = 'login.html';
+    }
+</script>
+
+<script>
+async function buy(item) {
+  const email = localStorage.getItem("userEmail");
+
+  const res = await fetch("http://localhost:3000/buy", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, item })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+}
+</script>
+
+</body>
+
+</html>

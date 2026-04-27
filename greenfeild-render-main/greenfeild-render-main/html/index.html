@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Greenfield Local Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+
+<body>
+<div class="page-wrap">
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="index.html" class="navbar-logo">
+            <div class="logo-badge">
+                <img src="image/Web Logo.png" alt="Logo">
+            </div>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="contact.html">Our Contact</a>
+            <a href="history.html">History</a>
+
+            <!-- Profile Avatar with Dropdown -->
+            <div style="position: relative;">
+                <div id="profile-avatar" onclick="toggleProfileMenu()" style="
+                    width: 40px; height: 40px; border-radius: 50%;
+                    background-color: #379f3b; color: white;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    font-weight: bold; font-size: 14px; cursor: pointer;">?</div>
+
+                <div id="profile-dropdown" style="
+                    display: none; position: absolute; right: 0; top: 50px;
+                    background: white; border-radius: 10px;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+                    min-width: 200px; z-index: 999; overflow: hidden;">
+
+                    <div style="padding: 15px; background: #379f3b; display: flex; align-items: center; gap: 10px;">
+                        <div id="dropdown-initials" style="
+                            width: 36px; height: 36px; border-radius: 50%;
+                            background: white; color: #379f3b;
+                            display: flex; align-items: center; justify-content: center;
+                            font-weight: bold; font-size: 14px;">?</div>
+                        <div id="dropdown-email" style="font-size: 12px; color: white; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></div>
+                    </div>
+
+                    <div onclick="logout()" style="
+                        padding: 12px 15px; cursor: pointer; color: #e53935;
+                        font-weight: 600; font-size: 14px;
+                        display: flex; align-items: center; gap: 8px;"
+                        onmouseover="this.style.background='#fff5f5'"
+                        onmouseout="this.style.background='white'">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <img src="image/farm grass.jpg" alt="Farm fields">
+        <div class="hero-overlay">
+            <div class="hero-text">
+                <h1>Fresh From Your Local Farmers</h1>
+                <p>Transparent pricing. Locally sourced. Supporting community.</p>
+                <div class="hero-btns">
+                    <a href="products.html" class="btn-solid">Shop Now</a>
+                    <a href="contact.html" class="btn-ghost">Meet Producers</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTRO -->
+    <section class="intro">
+        <p>The Green Field Local Hub (GLH) is a cooperative of local farmers and food producers which offers fresh products. We connect our community directly with the people who produce your food.</p>
+        <div class="intro-rule"></div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="reviews">
+        <div class="review-card">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"I love knowing my food source"</blockquote>
+            <cite>— James T.</cite>
+        </div>
+        <div class="review-card">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"So happy to support local farmers"</blockquote>
+            <cite>— Sarah P.</cite>
+        </div>
+        <div class="review-card">
+            <div class="stars">★ ★ ★ ★ ★</div>
+            <blockquote>"Great quality and friendly service"</blockquote>
+            <cite>— Mark D.</cite>
+        </div>
+    </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-col">
+        <h3>Greenfield Local Hub</h3>
+        <p>Connecting our community with fresh, local farm products.</p>
+    </div>
+    <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Farm Shop</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </div>
+    <div class="footer-col">
+        <h4>Contact</h4>
+        <p>hello@greenfieldhub.com</p>
+        <p>(123) 456-7890</p>
+        <p>Greenfield Community Market</p>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Greenfield Local Hub • Supporting Local Farms</p>
+    </div>
+</footer>
+
+<script>
+    const email = localStorage.getItem('userEmail');
+    if (email) {
+        const initials = email.substring(0, 2).toUpperCase();
+        document.getElementById('profile-avatar').textContent = initials;
+        document.getElementById('dropdown-email').textContent = email;
+        document.getElementById('dropdown-initials').textContent = initials;
+    }
+
+    function toggleProfileMenu() {
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('click', function(e) {
+        const avatar = document.getElementById('profile-avatar');
+        const dropdown = document.getElementById('profile-dropdown');
+        if (!avatar.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem('userEmail');
+        window.location.href = 'login.html';
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login – Greenfield Local Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page-wrap">
+
+<header class="navbar">
+    <a href="index.html" class="navbar-logo">
+        <div class="logo-badge">
+            <img src="image/Web Logo.png" alt="Logo">
+        </div>
+    </a>
+    <nav id="main-nav"></nav>
+</header>
+
+<section class="portal-wrap">
+    <h2 class="portal-heading">Farmer Portal</h2>
+    <div class="portal-tabs">
+        <a href="login.html" class="active">Login</a>
+        <a href="signup.html">Sign Up</a>
+    </div>
+    <div class="portal-body">
+        <div class="portal-photo">
+            <img src="image/farm-image.jpg" alt="Local farmer">
+        </div>
+        <div class="portal-form">
+            <div class="field">
+                <label>Email</label>
+                <div class="input-row">
+                    <input type="email" id="email" placeholder="Email">
+                </div>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <div class="input-row">
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                <!-- Role -->
+                <div class="field">
+                    <label>I am a</label>
+                    <div class="input-row">
+                        <select id="role" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;font-family:inherit;background:#fff;color:var(--text-dark);">
+                            <option value="customer">🛒 Customer</option>
+                            <option value="producer">🌿 Producer</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-meta">
+                <label><input type="checkbox"> Remember me</label>
+            </div>
+            <button class="submit-btn" onclick="login()">Login</button>
+            <p class="switch-note">Not registered? <a href="signup.html">Create an account</a></p>
+        </div>
+    </div>
+</section>
+
+</div>
+
+<footer>
+    <div class="footer-col">
+        <h3>Greenfield Local Hub</h3>
+        <p>Connecting our community with fresh, local farm products.</p>
+    </div>
+    <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Farm Shop</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </div>
+    <div class="footer-col">
+        <h4>Contact</h4>
+        <p>hello@greenfieldhub.com</p>
+        <p>(123) 456-7890</p>
+        <p>Greenfield Community Market</p>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Greenfield Local Hub • Supporting Local Farms</p>
+    </div>
+</footer>
+
+<script>
+(function buildNav() {
+    const email = localStorage.getItem("userEmail");
+    const role  = localStorage.getItem("userRole");
+    const nav   = document.getElementById("main-nav");
+    const page  = location.pathname.split("/").pop() || "index.html";
+
+    function a(href, label) {
+        return '<a href="' + href + '"' + (page === href ? ' class="active"' : '') + '>' + label + '</a>';
+    }
+
+    function avatarHTML() {
+        const initials = email.substring(0, 2).toUpperCase();
+        return '<div style="position:relative">'
+            + '<div id="nav-avatar" onclick="toggleNavMenu()" style="width:38px;height:38px;border-radius:50%;background:#379f3b;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;border:2px solid rgba(255,255,255,0.35)">' + initials + '</div>'
+            + '<div id="nav-dropdown" style="display:none;position:absolute;right:0;top:48px;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.14);min-width:200px;z-index:999;overflow:hidden">'
+            + '<div style="padding:14px 15px;background:#379f3b;display:flex;align-items:center;gap:10px">'
+            + '<div style="width:34px;height:34px;border-radius:50%;background:#fff;color:#379f3b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">' + initials + '</div>'
+            + '<div style="font-size:12px;color:#fff;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + email + '</div>'
+            + '</div>'
+            + '<div onclick="navLogout()" style="padding:12px 15px;cursor:pointer;color:#e53935;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px" onmouseover="this.style.background=\'#fff5f5\'" onmouseout="this.style.background=\'#fff\'">'
+            + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>'
+            + ' Logout</div></div></div>';
+    }
+
+    if (!email) {
+        nav.innerHTML = a("index.html","Home") + a("products.html","Products") + a("contact.html","Contact") + a("login.html","Login") + a("signup.html","Sign Up");
+    } else if (role === "producer") {
+        nav.innerHTML = a("index.html","Home") + a("products.html","Products") + a("contact.html","Contact") + a("dashboard.html","Dashboard") + avatarHTML();
+    } else {
+        nav.innerHTML = a("index.html","Home") + a("products.html","Products") + a("contact.html","Contact") + avatarHTML();
+    }
+})();
+
+function toggleNavMenu() {
+    const d = document.getElementById("nav-dropdown");
+    if (d) d.style.display = d.style.display === "none" ? "block" : "none";
+}
+function navLogout() {
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userRole");
+    window.location.href = "login.html";
+}
+document.addEventListener("click", function(e) {
+    const av = document.getElementById("nav-avatar");
+    const dd = document.getElementById("nav-dropdown");
+    if (av && dd && !av.contains(e.target) && !dd.contains(e.target)) dd.style.display = "none";
+});
+
+
+
+async function login() {
+    const email    = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) { alert("Please fill all fields"); return; }
+
+    const res  = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.message === "Login successful") {
+        localStorage.setItem("userEmail", data.email);
+        localStorage.setItem("userRole", data.role);
+        window.location.href = data.role === "producer" ? "dashboard.html" : "products.html";
+    } else {
+        alert(data.message);
+    }
+}
+</script>
+</body>
+</html>

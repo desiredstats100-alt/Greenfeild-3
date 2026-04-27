@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard – Greenfield Local Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dash { max-width: 1000px; margin: 0 auto; padding: 40px 30px 80px; }
+
+        .dash h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .dash .sub { font-size: 13px; color: var(--text-light); margin-bottom: 28px; }
+
+        /* STAT CARDS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat {
+            background: rgba(255,253,248,0.9);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat .icon { 
+        font-size: 22px;
+         margin-bottom: 6px; 
+         }
+        .stat .val  { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--green-btn); font-weight: 700; }
+        .stat .lbl  { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+        /* ORDERS TABLE */
+        .box {
+            background: rgba(255,253,248,0.9);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        /* same for history,I make the page take up the full viewport height */
+html, body {
+    height: 100%;
+}
+
+/* I turn the body into a vertical flex container */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* I allow the main content to expand and push the footer down */
+.page-wrap {
+    flex: 1;
+}
+
+        .box-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .box-head h3 { font-family: 'Playfair Display', serif; font-size: 15px; }
+
+        .box-head input {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            width: 210px;
+        }
+
+        .box-head input:focus { 
+        outline: none; 
+        border-color: var(--green-btn); }
+
+        table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        font-size: 13px; 
+        }
+        th { 
+        background: rgba(245,240,232,0.8); 
+        padding: 10px 16px; 
+        text-align: left; 
+        font-size: 11px; 
+        text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); border-bottom: 1px solid var(--border); }
+        td { padding: 12px 16px; border-bottom: 1px solid rgba(212,201,184,0.3); color: var(--text-mid); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(245,240,232,0.4); }
+
+        .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.standard { background: #e8f4e0; color: #3a5f1e; }
+        .badge.express  { background: #fff3e0; color: #e65100; }
+
+        .msg { text-align: center; padding: 36px; color: var(--text-light); font-size: 13px; }
+
+        @media (max-width: 700px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <header class="navbar">
+        <a href="index.html" class="navbar-logo">
+            <div class="logo-badge">
+                <img src="image/Web Logo.png" alt="Logo">
+            </div>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="contact.html">Contact</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="history.html" class="active">History</a>
+        </nav>
+    </header>
+
+    <div class="dash">
+        <h1>Order History</h1>
+        <p class="sub">Live overview of all orders — <a href="#" onclick="load()" style="color:var(--green-btn)">↻ Refresh</a></p>
+
+        <!--<div class="stats">
+            <div class="stat"><div class="icon">🛒</div><div class="val" id="s-orders">—</div><div class="lbl">Orders</div></div>
+            <div class="stat"><div class="icon">💷</div><div class="val" id="s-revenue">—</div><div class="lbl">Revenue</div></div>
+            <div class="stat"><div class="icon">📦</div><div class="val" id="s-items">—</div><div class="lbl">Items Sold</div></div>
+            <div class="stat"><div class="icon">🚚</div><div class="val" id="s-express">—</div><div class="lbl">Express</div></div>
+        </div>--->
+
+        <div class="box">
+            <div class="box-head">
+                <h3>All Orders</h3>
+                <input type="text" placeholder="Search name or email…" oninput="search(this.value)">
+            </div>
+            <div id="tableWrap"><div class="msg">Loading…</div></div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <div class="footer-col"><h3>Greenfield Local Hub</h3><p>Connecting our community with fresh, local farm products.</p></div>
+    <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="products.html">Farm Shop</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    <div class="footer-col"><h4>Contact</h4><p>hello@greenfieldhub.com</p><p>(123) 456-7890</p></div>
+    <div class="footer-bottom"><p>© 2026 Greenfield Local Hub • Supporting Local Farms</p></div>
+</footer>
+
+<script>
+var orders = [];
+
+//async function load() {
+//    try {console.log("Fetching all orders history");
+//        const res = await fetch("http://localhost:3000/orders");
+//        orders = await res.json();
+//        renderStats();
+//        renderTable(orders);
+//    } catch {
+//        document.getElementById("tableWrap").innerHTML = '<div class="msg">Could not connect to server.</div>';
+ //   }
+//}
+async function load() {
+            try {
+                const email = localStorage.getItem('userEmail');
+                console.log("Fetching order history for", email);
+                const res = await fetch(`http://localhost:3000/orders?email=${email}`);
+                orders = await res.json();
+
+                if (orders.length === 0) {
+                    document.getElementById("tableWrap").innerHTML = `
+                <div class="msg" style="
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: #888;
+                ">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🛒</div>
+                    <h3 style="margin: 0 0 8px;">No Orders Yet</h3>
+                    <p style="margin: 0; font-size: 14px;">Orders will appear here once customers start purchasing.</p>
+                </div>
+            `;
+                    return;
+                }
+
+            
+                renderTable(orders);
+
+            } catch (err) {
+                console.error('Fetch error:', err);
+                document.getElementById("tableWrap").innerHTML = `
+            <div class="msg" style="
+                text-align: center;
+                padding: 60px 20px;
+                color: #e53935;
+            ">
+                <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+                <h3 style="margin: 0 0 8px;">Could not connect to server</h3>
+                <p style="margin: 0; font-size: 14px;">Make sure your server is running on port 3000.</p>
+            </div>
+        `;
+            }
+        }
+
+//function renderStats() {
+ //   document.getElementById("s-orders").textContent  = orders.length;
+ //   document.getElementById("s-revenue").textContent = "£" + orders.reduce((s,o) => s + o.total, 0).toFixed(2);
+  //  document.getElementById("s-items").textContent   = orders.reduce((s,o) => s + o.items.reduce((si,i) => si + i.qty, 0), 0);
+  //  document.getElementById("s-express").textContent = orders.filter(o => o.delivery?.kind === "express").length;
+//}
+
+function renderTable(data) {
+    if (!data.length) { document.getElementById("tableWrap").innerHTML = '<div class="msg">No orders yet.</div>'; return; }
+    const rows = data.map(o => `
+        <tr>
+            <td style="font-family:monospace;font-size:11px;color:var(--text-light)">${o._id.toString().slice(-8).toUpperCase()}</td>
+            <td><strong>${o.customer.fname} ${o.customer.lname}</strong><br><span style="font-size:11.5px;color:var(--text-light)">${o.customer.email}</span></td>
+            <td style="font-size:12px;color:var(--text-light);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items.map(i => i.name + " ×" + i.qty).join(", ")}</td>
+            <td><span class="badge ${o.delivery?.kind || 'standard'}">${o.delivery?.kind || 'standard'}</span></td>
+            <td style="font-weight:700;color:var(--green-btn)">£${o.total.toFixed(2)}</td>
+            <td style="font-size:12px;color:var(--text-light)">${new Date(o.createdAt).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</td>
+        </tr>`).join("");
+    document.getElementById("tableWrap").innerHTML = `
+        <table>
+            <thead><tr><th>ID</th><th>Customer</th><th>Items</th><th>Delivery</th><th>Total</th><th>Date</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>`;
+}
+
+function search(q) {
+    q = q.toLowerCase();
+    renderTable(orders.filter(o =>
+        (o.customer.fname + " " + o.customer.lname).toLowerCase().includes(q) ||
+        o.customer.email.toLowerCase().includes(q)
+    ));
+}
+
+load();
+</script>
+</body>
+</html>
