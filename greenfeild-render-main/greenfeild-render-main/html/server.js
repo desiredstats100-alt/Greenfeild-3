@@ -1,6 +1,3 @@
-if (process.env.NODE_ENV !== 'production') {
-  process.env.MONGO_URI = "mongodb+srv://FarmDatabase:dubaibabu123@farm.tlipjkq.mongodb.net/?appName=Farm";
-}
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -23,10 +20,9 @@ mongoose.connect(process.env.MONGO_URI)
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
-  role: { type: String, default: 'customer' } // Stores 'customer' or 'producer'
+  role: { type: String, default: 'customer' }
 });
 
-// The Model variable "User" is essential for the signup/login functions to work
 const User = mongoose.model("User", userSchema);
 
 /* =========================
@@ -65,7 +61,9 @@ const purchaseSchema = new mongoose.Schema({
 
 const Purchase = mongoose.model("Purchase", purchaseSchema);
 
-// Product Schema
+/* =========================
+   PRODUCT SCHEMA
+========================= */
 const productSchema = new mongoose.Schema({
     name        : String,
     description : String,
@@ -78,7 +76,9 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', productSchema);
 
-// GET all products
+/* =========================
+   PRODUCT ROUTES
+========================= */
 app.get('/products', async (req, res) => {
     try {
         const products = await Product.find().sort({ category: 1 });
@@ -88,6 +88,7 @@ app.get('/products', async (req, res) => {
         res.status(500).json({ message: 'Error fetching products' });
     }
 });
+
 app.put('/products/:id', async (req, res) => {
     try {
         const { quantity, price } = req.body;
@@ -102,12 +103,13 @@ app.put('/products/:id', async (req, res) => {
         res.status(500).json({ message: 'Error updating product' });
     }
 });
+
 /* =========================
    SIGNUP
 ========================= */
 app.post("/signup", async (req, res) => {
   try {
-    const { email, password, role } = req.body; // Destructure role from request
+    const { email, password, role } = req.body;
 
     const existing = await User.findOne({ email });
     if (existing) {
@@ -115,7 +117,6 @@ app.post("/signup", async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    // Create new user with the specific role provided during signup
     const user = new User({ email, password: hashed, role: role || 'customer' });
     await user.save();
 
@@ -143,7 +144,6 @@ app.post("/login", async (req, res) => {
       return res.json({ message: "Incorrect password" });
     }
 
-    // Now returns the role so the frontend knows where to redirect
     res.json({ 
         message: "Login successful", 
         email: user.email, 
