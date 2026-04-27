@@ -281,7 +281,7 @@ body {
 
         async function load() {
             try {
-                const res = await fetch("http://localhost:3000/orders");
+                const res = await fetch("https://greenfeild-3-3bc8.onrender.com/orders");
                 orders = await res.json();
                 renderStats();
                 renderTable(orders);
@@ -292,7 +292,7 @@ body {
 
         async function loadProducts() {
             try {
-                const res = await fetch("http://localhost:3000/products");
+                const res = await fetch("https://greenfeild-3-3bc8.onrender.com/products");
                 products = await res.json();
                 console.log('Products response:', products);
 
@@ -406,7 +406,7 @@ function editProduct(id) {
         const qty   = parseInt(qtyInput.value);
         const price = parseFloat(priceInput.value);
 
-        fetch('http://localhost:3000/products/' + id, {
+        fetch('https://greenfeild-3-3bc8.onrender.com/products/' + id, {
             method  : 'PUT',
             headers : { 'Content-Type': 'application/json' },
             body    : JSON.stringify({ quantity: qty, price: price })

@@ -162,7 +162,7 @@ var orders = [];
 
 //async function load() {
 //    try {console.log("Fetching all orders history");
-//        const res = await fetch("http://localhost:3000/orders");
+//        const res = await fetch("https://greenfeild-3-3bc8.onrender.com/orders");
 //        orders = await res.json();
 //        renderStats();
 //        renderTable(orders);
@@ -174,7 +174,7 @@ async function load() {
             try {
                 const email = localStorage.getItem('userEmail');
                 console.log("Fetching order history for", email);
-                const res = await fetch(`http://localhost:3000/orders?email=${email}`);
+                const res = await fetch(`https://greenfeild-3-3bc8.onrender.com/orders?email=${email}`);
                 orders = await res.json();
 
                 if (orders.length === 0) {

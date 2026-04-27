@@ -450,7 +450,7 @@ function sendOrderToServer() {
         total:        cart.reduce(function(s,i){ return s + i.price*i.qty; }, 0) + dc
     };
 
-    fetch("http://localhost:3000/checkout", {
+    fetch("https://greenfeild-3-3bc8.onrender.com/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)

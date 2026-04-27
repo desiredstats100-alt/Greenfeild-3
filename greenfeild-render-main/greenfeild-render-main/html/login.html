@@ -142,7 +142,7 @@ async function login() {
 
     if (!email || !password) { alert("Please fill all fields"); return; }
 
-    const res  = await fetch("http://localhost:3000/login", {
+    const res  = await fetch("https://greenfeild-3-3bc8.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
